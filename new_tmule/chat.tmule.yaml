@@ -1,0 +1,16 @@
+---
+session: chatbot
+init_cmd:
+  #exec /bin/bash
+  cd @TMULE_CONFIG_DIR@ || true
+  set -o pipefail
+
+windows:
+- name: speech_to_text
+  panes: ros2 run visualiser audio_collector.py
+
+- name: openai
+  panes: ros2 run visualiser openai_chat.py
+
+- name: text_to_speech
+  panes: ros2 run visualiser speaker.py
