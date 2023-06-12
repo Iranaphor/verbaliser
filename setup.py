@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'verbalise'
+package_name = 'verbaliser'
 
 setup(
     name=package_name,
@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'sounddevice', 'SpeechRecognition', 'openai'],
+    install_requires=['setuptools', 'sounddevice', 'SpeechRecognition'],
     zip_safe=True,
     maintainer='james',
     maintainer_email='primordia@live.com',
@@ -20,9 +20,9 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'speaker.py = verbalise.speaker:main',
-            'audio_collector.py = verbalise.audio_collector:main',
-            'openai_chat.py = verbalise.openai_chat:main'
+            'speaker.py = verbaliser.speaker:main',
+            'audio_collector.py = verbaliser.audio_collector:main',
+            'openai_chat.py = verbaliser.openai_chat:main'
         ],
     },
 

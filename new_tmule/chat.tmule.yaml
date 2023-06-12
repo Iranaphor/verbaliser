@@ -7,10 +7,14 @@ init_cmd:
 
 windows:
 - name: speech_to_text
-  panes: ros2 run visualiser audio_collector.py
+  panes:
+  - ros2 run verbaliser audio_collector.py
 
 - name: openai
-  panes: ros2 run visualiser openai_chat.py
+  panes:
+  - ros2 run verbaliser openai_chat.py
 
 - name: text_to_speech
-  panes: ros2 run visualiser speaker.py
+  panes:
+  - ros2 run verbaliser speaker.py
+
