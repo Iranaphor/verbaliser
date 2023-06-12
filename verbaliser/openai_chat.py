@@ -21,8 +21,8 @@ class OpenAI(Node):
     def __init__(self):
         super().__init__('open_ai')
         self.prompt = "You: "
-        self.sub = self.create_subscription(String, '/openai/input', self.cb, 10)
-        self.pub = self.create_publisher(String, '/speaker/input', 10)
+        self.sub = self.create_subscription(String, '/verbaliser/audio_input', self.cb, 10)
+        self.pub = self.create_publisher(String, '/verbaliser/openai_reply', 10)
 
     def cb(self, msg):
         self.get_logger().info('User: ' + msg.data)

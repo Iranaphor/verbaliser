@@ -62,7 +62,7 @@ function vm () { tmule -c $VERBALISER_TMULE $1 ; }
 ```sh
 export OPENAI_API_KEY="insert-api-key-here"
 export CHAT_DIR=$HOME/chat_ws
-source $CHAT_DIR/install/setup.bash
+source $CHAT_DIR/src/runcom.sh
 ```
 6. close the terminal you have open and create a new one
 7. perform a build of your workspace using `chat_rebuild`

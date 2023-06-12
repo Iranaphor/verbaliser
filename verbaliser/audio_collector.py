@@ -17,9 +17,8 @@ class AudioCollector(Node):
         super().__init__('audio_collector')
         self.recogniser = sr.Recognizer()
         #print('\n'*10)
-        self.pub = self.create_publisher(String, '/openai/input', 10)
-        self.sub = self.create_subscription(Empty, '/speaker/trigger', self.trigger, 10)
-        self.sub = self.create_subscription(Empty, '~/trigger', self.trigger, 10)
+        self.pub = self.create_publisher(String, '/verbaliser/audio_input', 10)
+        self.sub = self.create_subscription(Empty, '/verbaliser/audio_trigger', self.trigger, 10)
 
     def trigger(self, msg):
 
@@ -46,10 +45,11 @@ class AudioCollector(Node):
         except:
             return
 
-        print("Google Speech Recognition thinks you said " + text)
+        print("Google Speech Recognition thinks you said: " + text)
         self.pub.publish(String(data=text))
 
-
+        if text == 'end':
+            self.sub = None
 
 def main(args=None):
     rclpy.init(args=args)

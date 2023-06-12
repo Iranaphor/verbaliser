@@ -17,8 +17,8 @@ from std_msgs.msg import String, Empty
 class Speaker(Node):
     def __init__(self):
         super().__init__('speaker')
-        self.sub = self.create_subscription(String, '~/input', self.callback, 10)
-        self.pub = self.create_publisher(Empty, '~/trigger', 10)
+        self.sub = self.create_subscription(String, '/verbaliser/openai_reply', self.callback, 10)
+        self.pub = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
 
     def callback(self, msg):
         self.get_logger().info(msg.data)

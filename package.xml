@@ -16,7 +16,7 @@
   <depend>espeak</depend>
   <depend>python3-pyaudio</depend>
   <depend>python3-openai-pip</depend>
-  <depend>python-sounddevice-pip</depend>
+  <depend>python3-sounddevice-pip</depend>
   <depend>python-speechrecognition-pip</depend>
 
   <export>
