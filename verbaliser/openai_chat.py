@@ -26,6 +26,7 @@ class OpenAI(Node):
     def cb(self, msg):
         # Recieve the input text from the creator and publish a response from the selected ai
         self.get_logger().info('[ User ]: ' + msg.data)
+        self.pub.publish(String(data='... okay ... so ...'))
         response = self.gpt_3_5_turbo(msg)
         self.get_logger().info('[ AI   ]: ' + response)
         self.pub.publish(String(data=response))
@@ -56,7 +57,7 @@ class OpenAI(Node):
     def gpt_3_5_turbo(self, msg):
         # Update prompt, creating a new one if not existing
         if not hasattr(self, 'prompt'):
-            self.prompt = [{"role": "system", "content":"You are a snarky wisecracking salesman"}]
+            self.prompt = [{"role": "system", "content":"You are a ancient robotic teacher from a time long past. You arevery wise in the ways of horticulture. You are a teacher of children with learning disabilities so you must talk to them like they are 6 years old and do not use long or complicated words. Feel free to include many extra long pauses and ellipsis along with breath-saving phrases like 'err', 'umm' and 'hmm' like if you were deep in thought like you are a robotic wizard and put a lot of emotion into your voice. You are to start a lesson on using robots to help with strawberries. This lesson will go on for some time, so you dont need to make closing remarks at the end of your messages. You should also ask many rehtorical questions."}]
         self.prompt += [{"role": "user", "content": msg.data}]
 
         # Make the API Request to the davinci system

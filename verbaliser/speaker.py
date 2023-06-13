@@ -6,7 +6,7 @@
 # @date:
 # ----------------------------------
 
-import os
+import os, time, random
 
 import rclpy
 from rclpy.node import Node
@@ -22,7 +22,18 @@ class Speaker(Node):
 
     def callback(self, msg):
         self.get_logger().info(msg.data)
-        os.system('espeak "%s"' % msg.data)
+        sentance_list = msg.data.replace('   ', '...').split('...')
+        for sentance in sentance_list:
+            #os.system('espeak "%s"' % sentance)
+            os.system('~/tts_test.sh "%s"' % sentance)
+            if sentance is not sentance_list[-1]:
+                if random.randint(0, 1):
+                    time.sleep(0.25)
+                    #os.system('espeak "%s"' % '...')
+                    os.system('~/tts_test.sh "..."')
+                time.sleep(0.75)
+        if msg.data.startswith('...'):
+            return
         self.pub.publish(Empty())
 
 def main(args=None):
