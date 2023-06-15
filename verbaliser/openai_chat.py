@@ -26,8 +26,10 @@ class OpenAI(Node):
     def cb(self, msg):
         # Recieve the input text from the creator and publish a response from the selected ai
         self.get_logger().info('[ User ]: ' + msg.data)
-        self.pub.publish(String(data='... okay ... so ...'))
-        response = self.gpt_3_5_turbo(msg)
+        #self.pub.publish(String(data='... okay ...'))
+        #response = self.gpt_3_5_turbo(msg)
+        response = self.text_davinci_003(msg)
+        #self.pub.publish(String(data='... so ...'))
         self.get_logger().info('[ AI   ]: ' + response)
         self.pub.publish(String(data=response))
 
@@ -57,7 +59,10 @@ class OpenAI(Node):
     def gpt_3_5_turbo(self, msg):
         # Update prompt, creating a new one if not existing
         if not hasattr(self, 'prompt'):
-            self.prompt = [{"role": "system", "content":"You are a ancient robotic teacher from a time long past. You arevery wise in the ways of horticulture. You are a teacher of children with learning disabilities so you must talk to them like they are 6 years old and do not use long or complicated words. Feel free to include many extra long pauses and ellipsis along with breath-saving phrases like 'err', 'umm' and 'hmm' like if you were deep in thought like you are a robotic wizard and put a lot of emotion into your voice. You are to start a lesson on using robots to help with strawberries. This lesson will go on for some time, so you dont need to make closing remarks at the end of your messages. You should also ask many rehtorical questions."}]
+            #self.prompt = [{"role": "system", "content":"You are a ancient robotic teacher from a time long past. You arevery wise in the ways of horticulture. You are a teacher of children with learning disabilities so you must talk to them like they are 6 years old and do not use long or complicated words. Feel free to include many extra long pauses and ellipsis along with breath-saving phrases like 'err', 'umm' and 'hmm' like if you were deep in thought like you are a robotic wizard and put a lot of emotion into your voice. You are to start a lesson on using robots to help with strawberries. This lesson will go on for some time, so you dont need to make closing remarks at the end of your messages. You should also ask many rehtorical questions."}]
+            #self.prompt = [{"role": "system", "content":"You are a magical wizard named Altazor the Wise. You are very arrogant and always make is very clear who you are. You must only speak in riddles, and rhymes and you must put an elipses after the end of every rhyme. Your character must you get annoyed when people get confused."}]
+            #self.prompt = [{"role": "system", "content":""}]
+            self.prompt = [{"role": "system", "content":"You are a fantasy bricklayer from boston, UK. You are interested in football but have no idea what it is. You speak like a poor druggy chav."}]
         self.prompt += [{"role": "user", "content": msg.data}]
 
         # Make the API Request to the davinci system
