@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #! /usr/bin/env python3
 # ----------------------------------
 # @author: jheselden
@@ -6,12 +5,18 @@
 # @date:
 # ----------------------------------
 
-import os, json
+import os
+ros_version = os.getenv('ROS_VERSION')
 
-import rclpy
-from rclpy.node import Node
+if ros_version == '1':
+    import rospy
+    Node = object
+elif ros_version == '2':
+    import rclpy
+    from rclpy.node import Node
 
 from std_msgs.msg import String
+import json
 
 import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -19,18 +24,25 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 class OpenAI(Node):
     def __init__(self):
-        super().__init__('open_ai')
-        self.sub = self.create_subscription(String, '/verbaliser/audio_input', self.cb, 10)
-        self.pub = self.create_publisher(String, '/verbaliser/openai_reply', 10)
+        self.recogniser = sr.Recognizer()
+        if ros_verison == '1':
+            self.info = rospy.loginfo
+            self.pub = rospy.Publisher('/verbaliser/audio_input', String, 10)
+            self.sub = rospy.Subscriber('/verbaliser/audio_trigger', String, self.cb, 10)
+        elif ros_verison == '2':
+            super().__init__('open_ai')
+            self.info = self.get_logger().info
+            self.sub = self.create_subscription(String, '/verbaliser/audio_input', self.cb, 10)
+            self.pub = self.create_publisher(String, '/verbaliser/openai_reply', 10)
 
     def cb(self, msg):
         # Recieve the input text from the creator and publish a response from the selected ai
-        self.get_logger().info('[ User ]: ' + msg.data)
+        self.info('[ User ]: ' + msg.data)
         #self.pub.publish(String(data='... okay ...'))
         #response = self.gpt_3_5_turbo(msg)
         response = self.text_davinci_003(msg)
         #self.pub.publish(String(data='... so ...'))
-        self.get_logger().info('[ AI   ]: ' + response)
+        self.info('[ AI   ]: ' + response)
         self.pub.publish(String(data=response))
 
     def text_davinci_003(self, msg):
@@ -74,7 +86,13 @@ class OpenAI(Node):
         return response
 
 
-def main(args=None):
+def ros1(args=None):
+    rospy.init_node('open_ai')
+    OAI = OpenAI()
+    rospy.spin()
+
+
+def ros2(args=None):
     rclpy.init(args=args)
 
     OAI = OpenAI()
@@ -84,5 +102,13 @@ def main(args=None):
     rclpy.shutdown()
 
 
+def main(args=None):
+    if ros_version == '1':
+        ros1(args)
+    elif ros_version == '2':
+        ros2(args)
+
+
 if __name__ == '__main__':
     main()
+
