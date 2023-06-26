@@ -6,20 +6,19 @@ init_cmd:
   set -o pipefail
 
 windows:
+- name: joy_triggers
+  panes:
+  - ros2 run joy joy_node
+  - ros2 run verbaliser triggers.py
+
 - name: speech_to_text
   panes:
   - ros2 run verbaliser audio_collector.py
 
 - name: openai
   panes:
-  - ros2 run verbaliser openai_chat.py
+  - ros2 run verbaliser openai_robotnav.py
 
 - name: text_to_speech
   panes:
   - ros2 run verbaliser speaker.py
-
-- name: joy_triggers
-  panes:
-  - ros2 run joy joy_node
-  - ros2 run verbaliser triggers.py
-

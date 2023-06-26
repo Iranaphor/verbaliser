@@ -16,11 +16,23 @@ class AudioCollector(Node):
     def __init__(self):
         super().__init__('audio_collector')
         self.recogniser = sr.Recognizer()
-        #print('\n'*10)
-        self.pub = self.create_publisher(String, '/verbaliser/audio_input', 10)
-        self.sub = self.create_subscription(Empty, '/verbaliser/audio_trigger', self.trigger, 10)
+        self.pub1 = self.create_publisher(String, '/verbaliser/smart_ai_input', 10)
+        self.pub2 = self.create_publisher(String, '/verbaliser/basic_ai_input', 10)
+        self.pub3 = self.create_publisher(String, '/verbaliser/function_ai_input', 10)
+        self.sub1 = self.create_subscription(Empty, '/verbaliser/smart_ai_audio_trigger', self.trigger1, 10)
+        self.sub2 = self.create_subscription(Empty, '/verbaliser/basic_ai_audio_trigger', self.trigger2, 10)
+        self.sub3 = self.create_subscription(Empty, '/verbaliser/function_ai_audio_trigger', self.trigger3, 10)
 
-    def trigger(self, msg):
+    def trigger1(self, msg):
+        self.trigger(msg, self.pub1)
+
+    def trigger2(self, msg):
+        self.trigger(msg, self.pub2)
+
+    def trigger3(self, msg):
+        self.trigger(msg, self.pub3)
+
+    def trigger(self, msg, pub):
 
         # obtain audio from the microphone
         with sr.Microphone() as source:
@@ -46,7 +58,7 @@ class AudioCollector(Node):
             return
 
         print("Google Speech Recognition thinks you said: " + text)
-        self.pub.publish(String(data=text))
+        pub.publish(String(data=text))
 
         if text == 'end':
             self.sub = None

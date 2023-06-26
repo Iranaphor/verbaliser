@@ -22,7 +22,9 @@ setup(
         'console_scripts': [
             'speaker.py = verbaliser.speaker:main',
             'audio_collector.py = verbaliser.audio_collector:main',
-            'openai_chat.py = verbaliser.openai_chat:main'
+            'openai_chat.py = verbaliser.openai_chat:main',
+            'openai_robotnav.py = verbaliser.openai_robotnav:main',
+            'triggers.py = verbaliser.triggers:main'
         ],
     },
 

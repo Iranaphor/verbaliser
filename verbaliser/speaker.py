@@ -18,7 +18,7 @@ class Speaker(Node):
     def __init__(self):
         super().__init__('speaker')
         self.sub = self.create_subscription(String, '/verbaliser/openai_reply', self.callback, 10)
-        self.pub = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
+        #self.pub = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
 
     def callback(self, msg):
         self.get_logger().info(msg.data)
@@ -32,9 +32,9 @@ class Speaker(Node):
                     os.system('espeak "%s"' % '...')
                     #os.system('~/tts_test.sh "..."')
                 time.sleep(0.75)
-        if msg.data.startswith('...'):
-            return
-        self.pub.publish(Empty())
+        #if msg.data.startswith('...'):
+        #    return
+        #self.pub.publish(Empty())
 
 def main(args=None):
     rclpy.init(args=args)
