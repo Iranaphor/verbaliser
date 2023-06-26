@@ -53,8 +53,6 @@ class OpenAINavigation(Node):
                       "parameters": {
                           "type": "object",
                           "properties": {
-                              #"robot": {"type": "string", "description": "The unique name of a robot."},
-                              #"node": {"type": "string", "description": "The name of a the location, node, or waypoint."},
                               "robot": {"type": "string", "enum": self.robots, "description": "The unique name of a robot"},
                               "node": {"type": "string", "enum": self.node_list, "description": "The name of the location, node or waypoint"},},
                           "required": ["robot", "node"],}}]
