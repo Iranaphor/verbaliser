@@ -15,16 +15,30 @@ from std_msgs.msg import String
 
 import openai
 openai.api_key = os.getenv("OPENAI_API_KEY")
+from openai.error import InvalidRequestError
 
 
 class OpenAI(Node):
     def __init__(self):
         super().__init__('open_ai')
+
+        # Define prompt
+        prompt = "You are a ROS2 specialist who is very technically gifted. "
+        prompt += "When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
+        self.prompt = [ ['system', 'system', prompt] ]
+        print('Current Prompt')
+        print(self.prompt)
+        self.sub0 = self.create_subscription(String, '/verbaliser/set_prompt', self.cb0, 10)
+
+        # Activate communications
         self.sub1 = self.create_subscription(String, '/verbaliser/smart_ai_input', self.cb1, 10)
         self.sub2 = self.create_subscription(String, '/verbaliser/basic_ai_input', self.cb2, 10)
         self.pub = self.create_publisher(String, '/verbaliser/openai_reply', 10)
-        self.prompt = [ ['system', 'system', self.get_prompt()] ]
 
+    def cb0(self, msg):
+        self.prompt = [ ['system', 'system', msg.data] ]
+        print('\n'*40+'Current Prompt')
+        print(self.prompt)
 
     def cb1(self, msg):
         self.call_ai(msg.data, self.gpt, 'AI')
@@ -35,6 +49,7 @@ class OpenAI(Node):
     def call_ai(self, data, ai, id):
         # Update stored prompt
         self.prompt += [["user", "You", data]]
+        print('\n')
         self.get_logger().info('[ User]: ' + data)
 
         # Get appropriate repsonse
@@ -42,6 +57,7 @@ class OpenAI(Node):
 
         # Update stored prompt
         self.prompt += [['assistant', 'Friend', response]]
+        print('\n')
         self.get_logger().info(f'[{id}]: ' + response)
 
         # Publish Message
@@ -72,12 +88,14 @@ class OpenAI(Node):
                [{"role": p[0], "content": p[2]} for p in self.prompt[1:]]
 
         # Make the API Request to GPT3.5
-        reply = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=chat)
-        return reply.to_dict()['choices'][0].to_dict()['message'].to_dict()['content'].replace('\n', ' ')
+        try:
+            reply = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=chat)
+            full_reply = reply.to_dict()['choices'][0].to_dict()['message'].to_dict()['content'].replace('\n', ' ')
 
+        except InvalidRequestError:
+            print('hit error, sending individual messages now')
 
-    def get_prompt(self):
-        return "You are a ROS2 specialist who is very technically gifted. When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
+        return full_reply
 
 
 def main(args=None):
