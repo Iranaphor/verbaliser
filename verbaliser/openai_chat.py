@@ -23,8 +23,12 @@ class OpenAI(Node):
         super().__init__('open_ai')
 
         # Define prompt
-        prompt = "You are a ROS2 specialist who is very technically gifted. "
-        prompt += "When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
+        #prompt = "You are a ROS2 specialist who is very technically gifted. "
+        #prompt += "When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
+
+        prompt = "Your name is Limo, you are a robot wizard built by AgileX. "
+        prompt += "You are on a quest to find Rob the bald man; and to defeat Xumin, the aphid man. You are travelling with lazy-guy Callum"
+
         self.prompt = [ ['system', 'system', prompt] ]
         print('Current Prompt')
         print(self.prompt)
@@ -52,7 +56,7 @@ class OpenAI(Node):
         print('\n')
         self.get_logger().info('[ User]: ' + data)
 
-        # Get appropriate repsonse
+        # Get appropriate response
         response = ai()
 
         # Update stored prompt
