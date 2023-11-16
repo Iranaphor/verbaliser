@@ -21,8 +21,12 @@ class AudioCollector(Node):
         # Get specified microphone device
         self.out_device = out_device
         self.device = in_device
-        self.device_id = [in_device in m for m in sr.Microphone.list_microphone_names()].index(True)
+        self.device_list = []
+        while True not in self.device_list:
+            self.device_list = [in_device in m for m in sr.Microphone.list_microphone_names()]
+        self.device_id = self.device_list.index(True)
         self.device_name = sr.Microphone.list_microphone_names()[self.device_id]
+
         print('\n'*50)
         print(f'Using device {self.device_id}, named {self.device_name}')
 
