@@ -41,12 +41,12 @@ class AudioCollector(Node):
         self.pub3 = self.create_publisher(String, '/verbaliser/function_ai_input', 10)
         
         self.pub0 = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
-        self.sub0 = self.create_subscription(Empty, '/verbaliser/audio_trigger', self.trigger1, 10)
+        self.sub0 = self.create_subscription(Empty, '/verbaliser/audio_trigger', self.trigger2, 10)
         self.sub1 = self.create_subscription(Empty, '/verbaliser/smart_ai_audio_trigger', self.trigger1, 10)
         self.sub2 = self.create_subscription(Empty, '/verbaliser/basic_ai_audio_trigger', self.trigger2, 10)
         self.sub3 = self.create_subscription(Empty, '/verbaliser/function_ai_audio_trigger', self.trigger3, 10)
 
-        self.trigger1(Empty())
+        self.trigger2(Empty())
 
     def trigger1(self, msg):
         self.trigger(msg, self.pub1)
@@ -72,7 +72,7 @@ class AudioCollector(Node):
                 #self.recogniser.adjust_for_ambient_noise(source)
                 self.beep()
                 print('begin listening...')
-                audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=5)
+                audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=10)
                 print('end listening...')
                 print(audio)
             except sr.WaitTimeoutError:

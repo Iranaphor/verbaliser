@@ -18,8 +18,19 @@ windows:
   panes:
   - ros2 run verbaliser speaker.py
 
-- name: joy_triggers
+#- name: joy_triggers
+#  panes:
+#  - ros2 run joy joy_node
+#  - ros2 run verbaliser triggers.py
+
+- name: limo_bringup
   panes:
-  - ros2 run joy joy_node
-  - ros2 run verbaliser triggers.py
+  - ros2 launch limo_bringup limo_start.launch.py
+  - ros2 run teleop_twist_keyboard teleop_twist_keyboard
+
+- name: limo_slam
+  panes:
+  - ros2 launch limo_navigation cartographer.launch.py
+  - ros2 run nav2_map_server map_saver_cli -f ~/map
+
 
