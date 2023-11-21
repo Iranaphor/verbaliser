@@ -38,7 +38,7 @@ class Speaker(Node):
                 os.system(espeak_docker % sentence)
             else:
                 os.system(espeak_standard % sentence)
-        
+
             # Add a pause if more then one sentence
             if sentence is not sentence_list[-1]:
                 if random.randint(0, 1):
@@ -51,7 +51,7 @@ class Speaker(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    SP = Speaker(use_docker_method=True)
+    SP = Speaker(use_docker_method=False)
     rclpy.spin(SP)
 
     SP.destroy_node()

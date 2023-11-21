@@ -19,7 +19,7 @@ class AudioCollector(Node):
     def __init__(self, in_device, out_device):
         super().__init__('audio_collector')
         self.mic_test_sub = self.create_subscription(String, '/verbaliser/mic_test', self.tests_sub, 10)
-        return
+        #return
 
         # Get specified microphone device
         self.out_device = out_device
@@ -41,6 +41,7 @@ class AudioCollector(Node):
         print('\n\n\n')
         print('mic found')
         self.device_name = sr.Microphone.list_microphone_names()[self.device_id]
+        self.chunk_size = 1024 if 'K66' not in self.device_name else 512
         print(f'Using device {self.device_id}, named {self.device_name}')
 
         # Construct recorder
@@ -71,7 +72,7 @@ class AudioCollector(Node):
             mic_list = sr.Microphone.list_microphone_names()
             from pprint import pprint
             pprint(mic_list)
-            id, rate = msg.data.split('~')
+            id, rate, chunk = msg.data.split('~')
             device_list = [id in m for m in mic_list]
             device_id = device_list.index(True)
             device_name = mic_list[device_id]
@@ -82,12 +83,12 @@ class AudioCollector(Node):
             print(f'Using device {device_id}, named {device_name}')
             print('\n\n\n')
             # Record microphone for maximum of 10 seconds
-            with sr.Microphone(device_index=device_id, sample_rate=int(rate)) as source:
+            with sr.Microphone(device_index=device_id, sample_rate=int(rate), chunk_size=int(chunk)) as source:
                 print(source.CHUNK)
                 print(source.SAMPLE_RATE)
                 print(source.SAMPLE_WIDTH)
                 print('recording start')
-                audio = recogniser.listen(source, timeout=5, phrase_time_limit=5)
+                audio = recogniser.listen(source, timeout=5, phrase_time_limit=2)
             print('recording complete')
 
             # Save recording to file
@@ -120,14 +121,14 @@ class AudioCollector(Node):
         # obtain audio from the microphone
         print('\n\n\n')
         print('trigger recieved')
-        with sr.Microphone(device_index=self.device_id) as source:
+        with sr.Microphone(device_index=self.device_id, chunk_size=self.chunk_size) as source:
             print('\n'*10)
             print("Collecting Information:")
             print(f'Using device {self.device_id}, named {self.device_name}')
 
             try:
                 #self.recogniser.adjust_for_ambient_noise(source)
-                #self.beep()
+                self.beep()
                 print('begin listening...')
                 audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=5)
                 print(dir(audio))
@@ -160,10 +161,14 @@ class AudioCollector(Node):
                 self.pub0.publish(Empty())
             self.say_failure = True
 
+#            time.sleep(2)
+#            self.pub0.publish(Empty())
             return
 
         except sr.RequestError as e:
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
+#            time.sleep(2)
+#            self.pub0.publish(Empty())
             return
         except Exception as e:
             print('other error')
@@ -181,13 +186,16 @@ class AudioCollector(Node):
         if text == 'end':
             self.sub = None
 
+#        print('\n\n\n\n\n\n\n')
+#        time.sleep(2)
+#        self.pub0.publish(Empty())
 
 
 
 def main(args=None):
     rclpy.init(args=args)
 
-    AC = AudioCollector(in_device='hw:0,0', out_device='hw:0,0')
+    AC = AudioCollector(in_device='hw:1,0', out_device='hw:0,0')
     rclpy.spin(AC)
 
     AC.destroy_node()
