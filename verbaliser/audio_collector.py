@@ -3,7 +3,8 @@
 # @desc: note, this example requires PyAudio because it uses the Microphone class
 # @url: https://github.com/Uberi/speech_recognition/blob/master/examples/microphone_recognition.py
 
-import os
+import os, sys
+import time
 
 import rclpy
 from rclpy.node import Node
@@ -22,12 +23,22 @@ class AudioCollector(Node):
         self.out_device = out_device
         self.device = in_device
         self.device_list = []
+        print('\n\n\n')
+        print('identifying mic')
         while True not in self.device_list:
-            self.device_list = [in_device in m for m in sr.Microphone.list_microphone_names()]
+            mic_list = sr.Microphone.list_microphone_names()
+            self.device_list = [in_device in m for m in mic_list]
+            if True not in self.device_list:
+                print('\n\n\n')
+                print(f"Device {in_device} not found. Will check again in 5 seconds.")
+                [print(m) for m in mic_list]
+                print('\n\n')
+            time.sleep(5)
         self.device_id = self.device_list.index(True)
-        self.device_name = sr.Microphone.list_microphone_names()[self.device_id]
 
-        print('\n'*50)
+        print('\n\n\n')
+        print('mic found')
+        self.device_name = sr.Microphone.list_microphone_names()[self.device_id]
         print(f'Using device {self.device_id}, named {self.device_name}')
 
         # Construct recorder
@@ -39,7 +50,7 @@ class AudioCollector(Node):
         self.pub1 = self.create_publisher(String, '/verbaliser/smart_ai_input', 10)
         self.pub2 = self.create_publisher(String, '/verbaliser/basic_ai_input', 10)
         self.pub3 = self.create_publisher(String, '/verbaliser/function_ai_input', 10)
-        
+
         self.pub0 = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
         self.sub0 = self.create_subscription(Empty, '/verbaliser/audio_trigger', self.trigger1, 10)
         self.sub1 = self.create_subscription(Empty, '/verbaliser/smart_ai_audio_trigger', self.trigger1, 10)
@@ -57,26 +68,31 @@ class AudioCollector(Node):
     def trigger3(self, msg):
         self.trigger(msg, self.pub3)
 
-    def beep(self):
-        os.system('espeak "u" --stdout | sox -t wav - -r 1000 -t wav - remix 1 1 | aplay -D %s'%self.out_device)
+    def beep(self, data='i', speed=1000):
+        cmd = 'espeak "%s" --stdout | sox -t wav - -r %s -t wav - remix 1 1 | aplay -D %s'
+        os.system(cmd % (data, speed, self.out_device))
 
     def trigger(self, msg, pub):
 
         # obtain audio from the microphone
+        print('\n\n\n')
+        print('trigger recieved')
         with sr.Microphone(device_index=self.device_id) as source:
             print('\n'*10)
             print("Collecting Information:")
             print(f'Using device {self.device_id}, named {self.device_name}')
 
             try:
-                #self.recogniser.adjust_for_ambient_noise(source)
+                self.recogniser.adjust_for_ambient_noise(source)
                 self.beep()
                 print('begin listening...')
                 audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=5)
+                print(dir(audio))
                 print('end listening...')
                 print(audio)
             except sr.WaitTimeoutError:
                 print('no audio collected')
+                self.beep('uh', 10)
                 self.pub0.publish(Empty())
                 return
             print('audio recorded')
@@ -113,7 +129,7 @@ class AudioCollector(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    AC = AudioCollector(in_device='hw:3,0', out_device='hw:2,0')
+    AC = AudioCollector(in_device='hw:0,0', out_device='hw:0,0')
     rclpy.spin(AC)
 
     AC.destroy_node()
