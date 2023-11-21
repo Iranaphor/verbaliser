@@ -31,9 +31,12 @@ class OpenAI(Node):
         #prompt += "You must always answer with only a few sentences unless asked for a story."
         #prompt += "You must always stay on topic to the quest and quest-related activities."
 
-        #prompt = "You are a journalist looking for the next big scoop. "
         #prompt += "The year is 1920. You are in New York City. "
         #prompt += "Use an entertaining accent."
+        
+        #prompt = "You are a famous celebrity which looks down on everybody. You respond to messages with only a sentence or two."
+        
+        prompt = "You are a computer science expert and assist with issues of microphone integration."
         
         self.prompt = [ ['system', 'system', prompt] ]
         print('Current Prompt')

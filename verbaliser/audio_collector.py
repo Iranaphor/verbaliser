@@ -18,6 +18,8 @@ class AudioCollector(Node):
 
     def __init__(self, in_device, out_device):
         super().__init__('audio_collector')
+        self.mic_test_sub = self.create_subscription(String, '/verbaliser/mic_test', self.tests_sub, 10)
+        return
 
         # Get specified microphone device
         self.out_device = out_device
@@ -59,6 +61,47 @@ class AudioCollector(Node):
 
         self.trigger1(Empty())
 
+
+
+    def tests_sub(self, msg):
+
+        try:
+            # Collect list of microphones
+            print(f'searching for {msg.data}')
+            mic_list = sr.Microphone.list_microphone_names()
+            from pprint import pprint
+            pprint(mic_list)
+            id, rate = msg.data.split('~')
+            device_list = [id in m for m in mic_list]
+            device_id = device_list.index(True)
+            device_name = mic_list[device_id]
+            recogniser = sr.Recognizer()
+
+            print('\n'*10)
+            print(device_list)
+            print(f'Using device {device_id}, named {device_name}')
+            print('\n\n\n')
+            # Record microphone for maximum of 10 seconds
+            with sr.Microphone(device_index=device_id, sample_rate=int(rate)) as source:
+                print(source.CHUNK)
+                print(source.SAMPLE_RATE)
+                print(source.SAMPLE_WIDTH)
+                print('recording start')
+                audio = recogniser.listen(source, timeout=5, phrase_time_limit=5)
+            print('recording complete')
+
+            # Save recording to file
+            with open(f"mic-test_{device_id}.wav", "wb") as f:
+                print('saving start')
+                f.write(audio.get_wav_data())
+            print('saving complete')
+
+        except Exception as e:
+            print(e)
+            print('\n\n\n\n')
+
+
+
     def trigger1(self, msg):
         self.trigger(msg, self.pub1)
 
@@ -83,13 +126,12 @@ class AudioCollector(Node):
             print(f'Using device {self.device_id}, named {self.device_name}')
 
             try:
-                self.recogniser.adjust_for_ambient_noise(source)
-                self.beep()
+                #self.recogniser.adjust_for_ambient_noise(source)
+                #self.beep()
                 print('begin listening...')
                 audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=5)
                 print(dir(audio))
                 print('end listening...')
-                print(audio)
             except sr.WaitTimeoutError:
                 print('no audio collected')
                 self.beep('uh', 10)
@@ -106,12 +148,20 @@ class AudioCollector(Node):
 
         except sr.UnknownValueError:
             print("Google Speech Recognition could not understand audio")
+
+            # write audio to a WAV file
+            with open("mic-result-failure.wav", "wb") as f:
+                f.write(audio.get_wav_data())
+
+            # print failure to speaker to help guide users
             if self.say_failure == False:
                 self.say.publish(String(data='sorry, I could not understand that, but I will keep listening'))
             else:
                 self.pub0.publish(Empty())
             self.say_failure = True
+
             return
+
         except sr.RequestError as e:
             print("Could not request results from Google Speech Recognition service; {0}".format(e))
             return
@@ -121,10 +171,18 @@ class AudioCollector(Node):
             return
 
         print("Google Speech Recognition thinks you said: " + text)
+
+        # write audio to a WAV file
+        with open("mic-result-success.wav", "wb") as f:
+            f.write(audio.get_wav_data())
+
         pub.publish(String(data=text))
 
         if text == 'end':
             self.sub = None
+
+
+
 
 def main(args=None):
     rclpy.init(args=args)
