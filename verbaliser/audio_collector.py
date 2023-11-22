@@ -194,8 +194,10 @@ class AudioCollector(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    in_device = os.getenv('ALSA_INPUT', 'hw:1,0')
+    out_device = os.getenv('ALSA_OUTPUT', 'hw:2,0')
 
-    AC = AudioCollector(in_device='hw:1,0', out_device='hw:0,0')
+    AC = AudioCollector(in_device=in_device, out_device=out_device)
     rclpy.spin(AC)
 
     AC.destroy_node()

@@ -13,10 +13,6 @@ from rclpy.node import Node
 
 from std_msgs.msg import String, Empty
 
-# Types of espeak
-espeak_standard = 'espeak "%s"'
-espeak_docker = 'espeak "%s" --stdout | sox -t wav - -r 48000 -t wav - remix 1 1 | aplay -D hw:2,0'
-
 
 class Speaker(Node):
     def __init__(self, use_docker_method=False):
@@ -28,16 +24,20 @@ class Speaker(Node):
     def callback(self, msg):
         self.get_logger().info(msg.data)
 
+        # Idenntify speaker and set format for msg publishing
+        out_device = os.getenv('ALSA_OUTPUT', 'hw:2,0')
+        espeak_standard = 'espeak "%s"'
+        espeak_docker = 'espeak "%s" --stdout | sox -t wav - -r 48000 -t wav - remix 1 1 | aplay -D %s'
+
         # Convert message to list of sentences
         sentence_list = msg.data.replace('"',',').replace('   ', '...').split('...')
-
         for sentence in sentence_list:
 
             # Output the speech to docker
             if self.use_docker_method:
-                os.system(espeak_docker % sentence)
+                os.system(espeak_docker % (sentence))
             else:
-                os.system(espeak_standard % sentence)
+                os.system(espeak_standard % (sentence, out_device))
 
             # Add a pause if more then one sentence
             if sentence is not sentence_list[-1]:
@@ -50,8 +50,9 @@ class Speaker(Node):
 
 def main(args=None):
     rclpy.init(args=args)
+    docker_espeak = os.getenv('DOCKER_ESPEAK', False)
 
-    SP = Speaker(use_docker_method=False)
+    SP = Speaker(use_docker_method=docker_espeak)
     rclpy.spin(SP)
 
     SP.destroy_node()
