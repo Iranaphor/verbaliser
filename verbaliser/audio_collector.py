@@ -47,7 +47,7 @@ class AudioCollector(Node):
         # Construct recorder
         self.say_failure = False
         self.recogniser = sr.Recognizer()
-        self.say = self.create_publisher(String, '/verbaliser/openai_reply', 10)
+        self.say = self.create_publisher(String, '/verbaliser/speaker', 10)
 
         # Construct ROS connections
         self.pub1 = self.create_publisher(String, '/verbaliser/smart_ai_input', 10)

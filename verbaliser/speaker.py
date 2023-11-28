@@ -18,7 +18,7 @@ class Speaker(Node):
     def __init__(self, use_docker_method=False):
         super().__init__('speaker')
         self.use_docker_method = use_docker_method
-        self.sub = self.create_subscription(String, '/verbaliser/openai_reply', self.callback, 10)
+        self.sub = self.create_subscription(String, '/verbaliser/speaker', self.callback, 10)
         self.pub = self.create_publisher(Empty, '/verbaliser/audio_trigger', 10)
 
     def callback(self, msg):
@@ -35,9 +35,10 @@ class Speaker(Node):
 
             # Output the speech to docker
             if self.use_docker_method:
-                os.system(espeak_docker % (sentence))
+                print(sentence)
+                os.system(espeak_docker % (sentence, out_device))
             else:
-                os.system(espeak_standard % (sentence, out_device))
+                os.system(espeak_standard % (sentence))
 
             # Add a pause if more then one sentence
             if sentence is not sentence_list[-1]:

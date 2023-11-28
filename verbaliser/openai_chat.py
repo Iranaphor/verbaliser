@@ -46,7 +46,7 @@ class OpenAI(Node):
         # Activate communications
         self.sub1 = self.create_subscription(String, '/verbaliser/smart_ai_input', self.cb1, 10)
         self.sub2 = self.create_subscription(String, '/verbaliser/basic_ai_input', self.cb2, 10)
-        self.pub = self.create_publisher(String, '/verbaliser/openai_reply', 10)
+        self.pub = self.create_publisher(String, '/verbaliser/speaker', 10)
 
     def cb0(self, msg):
         self.prompt = [ ['system', 'system', msg.data] ]
