@@ -23,20 +23,22 @@ class OpenAI(Node):
         super().__init__('open_ai')
 
         # Define prompt
-        #prompt = "You are a ROS2 specialist who is very technically gifted. "
-        #prompt += "When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
+        prompt = os.getenv('OPENAI_PROMPT')
+        if not prompt:
+            #prompt = "You are a ROS2 specialist who is very technically gifted. "
+            #prompt += "When you recieve questions about programming, respond only with the single line of code solution to the problem, do not include a description of the solution."
 
-        prompt = "Your name is Limo, you are a robot wizard built by AgileX. "
-        prompt += "You are on a quest with lazy-guy Callumn to find Rob the bald-man; and to defeat Xumin, the aphid-man."
-        prompt += "You must always answer with only a few sentences unless asked for a story."
-        prompt += "You must always stay on topic to the quest and quest-related activities."
+            prompt = "Your name is Limo, you are a robot wizard built by AgileX. "
+            prompt += "You are on a quest with lazy-guy Callumn to find Rob the bald-man; and to defeat Xumin, the aphid-man."
+            prompt += "You must always answer with only a few sentences unless asked for a story."
+            prompt += "You must always stay on topic to the quest and quest-related activities."
 
-        #prompt += "The year is 1920. You are in New York City. "
-        #prompt += "Use an entertaining accent."
+            #prompt += "The year is 1920. You are in New York City. "
+            #prompt += "Use an entertaining accent."
 
-        #prompt = "You are a famous celebrity which looks down on everybody. You respond to messages with only a sentence or two."
+            #prompt = "You are a famous celebrity which looks down on everybody. You respond to messages with only a sentence or two."
 
-        #prompt = "You are a computer science expert and assist with issues of microphone integration."
+            #prompt = "You are a computer science expert and assist with issues of microphone integration."
 
         self.prompt = [ ['system', 'system', prompt] ]
         print('Current Prompt')
@@ -106,7 +108,10 @@ class OpenAI(Node):
             full_reply = reply.to_dict()['choices'][0].to_dict()['message'].to_dict()['content'].replace('\n', ' ')
 
         except InvalidRequestError:
-            print('hit error, sending individual messages now')
+            print('invalid request error recieved')
+
+        except openai.erorr.RateLimitError:
+            print('rate limit error recieved')
 
         return full_reply
 

@@ -19,7 +19,6 @@ class AudioCollector(Node):
     def __init__(self, in_device, out_device):
         super().__init__('audio_collector')
         self.mic_test_sub = self.create_subscription(String, '/verbaliser/mic_test', self.tests_sub, 10)
-        #return
 
         # Get specified microphone device
         self.out_device = out_device

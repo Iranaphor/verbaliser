@@ -11,7 +11,7 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'sounddevice', 'SpeechRecognition'],
+    install_requires=['setuptools', 'sounddevice', 'SpeechRecognition', 'elevenlabs', 'pygame'],
     zip_safe=True,
     maintainer='james',
     maintainer_email='primordia@live.com',
@@ -20,10 +20,15 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'speaker.py = verbaliser.speaker:main',
-            'audio_collector.py = verbaliser.audio_collector:main',
-            'openai_chat.py = verbaliser.openai_chat:main',
-            'openai_robotnav.py = verbaliser.openai_robotnav:main',
+            # Inputs
+            'audio_collector.py = verbaliser.input_methods.audio_collector:main',
+            # Dialogue
+            'openai_chat.py = verbaliser.dialogue_methods.openai_chat:main',
+            'openai_robotnav.py = verbaliser.dialogue_methods.openai_robotnav:main',
+            # Outputs
+            'speaker.py = verbaliser.output_methods.speaker:main',
+            'elevenlabs_speaker.py = verbaliser.output_methods.elevenlabs_speaker:main',
+            #Other
             'triggers.py = verbaliser.triggers:main'
         ],
     },

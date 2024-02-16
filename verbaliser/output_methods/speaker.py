@@ -51,7 +51,7 @@ class Speaker(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    docker_espeak = os.getenv('DOCKER_ESPEAK', False)
+    docker_espeak = os.getenv('DOCKER_ESPEAK', True)
 
     SP = Speaker(use_docker_method=docker_espeak)
     rclpy.spin(SP)

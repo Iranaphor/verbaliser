@@ -1,13 +1,15 @@
 ---
 session: chatbot
-init_cmd:
+init_cmd: |
   #exec /bin/bash
   cd @TMULE_CONFIG_DIR@ || true
   set -o pipefail
+  source /etc/bash.bashrc
 
 windows:
 - name: speech_to_text
   panes:
   - ros2 run verbaliser audio_collector.py
   - ros2 run verbaliser openai_chat.py
-  - ros2 run verbaliser speaker.py
+  - echo ros2 run verbaliser speaker.py
+  - ros2 run verbaliser elevenlabs_speaker.py
