@@ -130,7 +130,6 @@ class AudioCollector(Node):
                 self.beep()
                 print('begin listening...')
                 audio = self.recogniser.listen(source, timeout=5, phrase_time_limit=5)
-                print(dir(audio))
                 print('end listening...')
             except sr.WaitTimeoutError:
                 print('no audio collected')
